@@ -1,6 +1,7 @@
 library material_progress;
 
 import 'dart:html';
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 const String PROGRESS_INDETERMINATE = 'mdl-progress__indeterminate';
 const String IS_UPGRADED = 'is-upgraded';
@@ -12,7 +13,7 @@ const String BAR3 = 'bar3';
 const String BUFFER_BAR = 'bufferbar';
 const String AUX_BAR = 'auxbar';
 
-class ProgressBehavior {
+class ProgressBehavior extends BaseBehavior {
   Element element;
   Element progressBar;
   Element bufferBar;
@@ -21,7 +22,9 @@ class ProgressBehavior {
   num _buffer;
 
   ProgressBehavior(this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     if (element != null) {
       progressBar = new DivElement()
         ..classes.addAll([PROGRESS_BAR, BAR, BAR1])

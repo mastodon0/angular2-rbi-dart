@@ -3,6 +3,7 @@ library material_radio;
 import 'material_ripple.dart' show RippleBehavior;
 import 'dart:html';
 import 'dart:async' show Timer;
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 // css classes
 const String JS_RADIO = 'mdl-js-radio';
@@ -19,12 +20,14 @@ const String IS_DISABLED = 'is-disabled';
 const String IS_CHECKED = 'is-checked';
 const String IS_UPGRADED = 'is-upgraded';
 
-class RadioBehavior {
+class RadioBehavior extends BaseBehavior {
   Element element;
   InputElement buttonElement;
 
   RadioBehavior(this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     buttonElement = element.querySelector('.' + RADIO_BTN);
 
     Element outerCircle = new SpanElement()..classes.add(RADIO_OUTER_CIRCLE);
@@ -40,18 +43,25 @@ class RadioBehavior {
       Element rippleContainer = new SpanElement()
         ..classes
             .addAll([RADIO_RIPPLE_CONTAINER, RIPPLE_EFFECT, RIPPLE_CENTER]);
-      rippleContainer.addEventListener('mouseup', onMouseup);
+      subscriptions.add(rippleContainer.onMouseUp.listen(onMouseup));
       Element ripple = new SpanElement()..classes.add(RIPPLE);
       rippleContainer.append(ripple);
       element.append(rippleContainer);
       RippleBehavior rb = new RippleBehavior(rippleContainer);
-      rb.init();
+      children.add(rb);
+      rb.ngOnInit();
     }
-    buttonElement.addEventListener('change', onChange);
-    buttonElement.addEventListener('focus', onFocus);
-    buttonElement.addEventListener('blur', onBlur);
+
+    //removed manually
     buttonElement.addEventListener('m-r-g-updated', onUpdated);
-    element.addEventListener('mouseup', onMouseup);
+
+    subscriptions.addAll([
+      buttonElement.onChange.listen(onChange),
+      buttonElement.onFocus.listen(onFocus),
+      buttonElement.onBlur.listen(onBlur),
+      element.onMouseUp.listen(onMouseup)
+    ]);
+
     // wait a click for angular2 to set values
     Timer.run(() {
       updateClasses();
@@ -126,5 +136,11 @@ class RadioBehavior {
 
   uncheck() {
     buttonElement.checked = false;
+  }
+
+  @override
+  ngOnDestroy() {
+    super.ngOnDestroy();
+    buttonElement.removeEventListener('m-r-g-updated', onUpdated);
   }
 }

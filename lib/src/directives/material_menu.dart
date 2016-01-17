@@ -2,7 +2,8 @@ library material_menu;
 
 import 'dart:html';
 import 'material_ripple.dart' show RippleBehavior;
-import 'dart:async' show Timer;
+import 'dart:async' show StreamSubscription, Timer;
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 const String MENU_CONTAINER = 'mdl-menu__container';
 const String OUTLINE = 'mdl-menu__outline';
@@ -34,15 +35,18 @@ const double TRANSITION_DURATION_SECONDS = 0.3;
 const double TRANSITION_DURATION_FRACTION = 0.8;
 const int CLOSE_TIMEOUT = 150;
 
-class MenuBehavior {
+class MenuBehavior extends BaseBehavior {
   Element element;
   Element container;
   Element outline;
   Element forElement;
   bool closing = false;
+  StreamSubscription clickedAwaySubscription;
 
   MenuBehavior(this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     container = new DivElement();
     container.classes.add(MENU_CONTAINER);
     element.parent.insertBefore(container, element);
@@ -59,14 +63,18 @@ class MenuBehavior {
     if (forElId != null) {
       forElement = document.getElementById(forElId);
       if (forElement != null) {
-        forElement.addEventListener('click', handleForClick);
-        forElement.addEventListener('keydown', handleForKeyboardEvent);
+        subscriptions.addAll([
+          forElement.onClick.listen(handleForClick),
+          forElement.onKeyDown.listen(handleForKeyboardEvent)
+        ]);
       }
     }
     List<Element> items = element.querySelectorAll('.' + ITEM);
     for (Element item in items) {
-      item.addEventListener('click', handleItemClick);
-      item.addEventListener('keydown', handleItemKeyboardEvent);
+      subscriptions.addAll([
+        item.onClick.listen(handleItemClick),
+        item.onKeyDown.listen(handleItemKeyboardEvent)
+      ]);
     }
     if (element.classes.contains(RIPPLE_EFFECT)) {
       element.classes.add(RIPPLE_IGNORE_EVENTS);
@@ -80,7 +88,8 @@ class MenuBehavior {
         item.append(rippleContainer);
         item.classes.add(RIPPLE_EFFECT);
         RippleBehavior rb = new RippleBehavior(item);
-        rb.init();
+        children.add(rb);
+        rb.ngOnInit();
       }
     }
     for (String klass in [
@@ -245,11 +254,14 @@ class MenuBehavior {
       Function clickedAway;
       clickedAway = ((Event e) {
         if (e != event && (closing == false || closing == null)) {
+          clickedAwaySubscription.cancel();
+          subscriptions.remove(clickedAwaySubscription);
           document.removeEventListener('click', clickedAway);
           hide();
         }
       });
-      document.addEventListener('click', clickedAway);
+      clickedAwaySubscription = document.onClick.listen(clickedAway);
+      subscriptions.add(clickedAwaySubscription);
     }
   }
 
@@ -284,4 +296,11 @@ class MenuBehavior {
     element.removeEventListener('webkitTransitionend', transitionCleanup);
     element.classes.remove(IS_ANIMATING);
   }
+
+  @override
+  ngOnDestroy() {
+    super.ngOnDestroy();
+    transitionCleanup(null);
+  }
+
 }

@@ -3,6 +3,7 @@ library material_switch;
 import 'material_ripple.dart' show RippleBehavior;
 import 'dart:html';
 import 'dart:async' show Timer;
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 const String SWITCH_INPUT = 'mdl-switch__input';
 const String TRACK = 'mdl-switch__track';
@@ -18,12 +19,14 @@ const String IS_DISABLED = 'is-disabled';
 const String IS_CHECKED = 'is-checked';
 const String IS_UPGRADED = 'is-upgraded';
 
-class SwitchBehavior {
+class SwitchBehavior extends BaseBehavior {
   Element element;
   CheckboxInputElement inputElement;
 
   SwitchBehavior(this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     inputElement = element.querySelector('.' + SWITCH_INPUT);
     Element track = new DivElement()..classes.add(TRACK);
     Element thumb = new DivElement()..classes.add(THUMB);
@@ -33,19 +36,21 @@ class SwitchBehavior {
     if (element.classes.contains(RIPPLE_EFFECT)) {
       element.classes.add(RIPPLE_IGNORE_EVENTS);
       Element rippleContainer = new SpanElement()
-        ..classes
-            .addAll([SWITCH_RIPPLE_CONTAINER, RIPPLE_EFFECT, RIPPLE_CENTER])
-        ..addEventListener('mouseup', onMouseUp);
+        ..classes.addAll([SWITCH_RIPPLE_CONTAINER, RIPPLE_EFFECT, RIPPLE_CENTER]);
+      subscriptions.add(rippleContainer.onMouseUp.listen(onMouseUp));
       Element ripple = new SpanElement()..classes.add(RIPPLE);
       rippleContainer.append(ripple);
       element.append(rippleContainer);
       RippleBehavior rb = new RippleBehavior(rippleContainer);
-      rb.init();
+      children.add(rb);
+      rb.ngOnInit();
     }
-    inputElement.addEventListener('change', onChange);
-    inputElement.addEventListener('focus', onFocus);
-    inputElement.addEventListener('blur', onBlur);
-    element.addEventListener('mouseup', onMouseUp);
+    subscriptions.addAll([
+      inputElement.onChange.listen(onChange),
+      inputElement.onFocus.listen(onFocus),
+      inputElement.onBlur.listen(onBlur),
+      element.onMouseUp.listen(onMouseUp)
+    ]);
     // wait a click for angular2
     Timer.run(() {
       updateClasses();

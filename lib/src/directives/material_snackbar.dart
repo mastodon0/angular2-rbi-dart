@@ -20,13 +20,14 @@ library material_snackbar;
 import 'dart:html';
 import 'dart:async';
 import 'dart:collection';
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 const String SNACKBAR = 'mdl-snackbar';
 const String MESSAGE = 'mdl-snackbar__text';
 const String ACTION = 'mdl-snackbar__action';
 const String ACTIVE = 'is-active';
 
-class SnackbarBehavior {
+class SnackbarBehavior extends BaseBehavior {
   Element element;
   Element actionElement;
   Element textElement;
@@ -40,7 +41,9 @@ class SnackbarBehavior {
 
 
   SnackbarBehavior(this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     setDefaults();
   }
 
@@ -83,8 +86,8 @@ class SnackbarBehavior {
       actionElement = new ButtonElement()
         ..type = 'button'
         ..classes.add(ACTION)
-        ..text = actionText
-        ..addEventListener('click', actionHandler);
+        ..text = actionText;
+      subscriptions.add(actionElement.onClick.listen(actionHandler));
       snackbarElement.append(actionElement);
     }
     element.append(snackbarElement);
@@ -117,5 +120,11 @@ class SnackbarBehavior {
     actionHandler = null;
     message = null;
     actionText = null;
+  }
+
+  @override
+  ngOnDestroy() {
+    super.ngOnDestroy();
+    cleanup();
   }
 }

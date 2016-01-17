@@ -3,6 +3,7 @@ library material_checkbox;
 import 'material_ripple.dart' show RippleBehavior;
 import 'dart:html';
 import 'dart:async';
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 // css classes
 
@@ -21,11 +22,13 @@ const String IS_CHECKED = 'is-checked';
 const String IS_UPGRADED = 'is-upgraded';
 const int TINY_TIMEOUT = 1;
 
-class CheckboxBehavior {
+class CheckboxBehavior extends BaseBehavior {
   Element element;
   InputElement inputElement;
   CheckboxBehavior(Element this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     if (element != null) {
       if (!element.classes.contains(IS_UPGRADED)) {
         inputElement = element.querySelector('.' + CHECKBOX_INPUT);
@@ -40,17 +43,20 @@ class CheckboxBehavior {
           Element rippleContainer = new SpanElement()
             ..classes.addAll(
                 [CHECKBOX_RIPPLE_CONTAINER, RIPPLE_EFFECT, RIPPLE_CENTER]);
-          rippleContainer.addEventListener('mouseup', onMouseUp);
+          subscriptions.add(rippleContainer.onMouseUp.listen(onMouseUp));
           Element ripple = new SpanElement()..classes.add(RIPPLE);
           rippleContainer.append(ripple);
           element.append(rippleContainer);
           RippleBehavior rb = new RippleBehavior(rippleContainer);
-          rb.init();
+          children.add(rb);
+          rb.ngOnInit();
         }
-        inputElement.addEventListener('change', onChange);
-        inputElement.addEventListener('focus', onFocus);
-        inputElement.addEventListener('blur', onBlur);
-        element.addEventListener('mouseup', onMouseUp);
+        subscriptions.addAll([
+          inputElement.onChange.listen(onChange),
+          inputElement.onFocus.listen(onFocus),
+          inputElement.onBlur.listen(onBlur),
+          element.onMouseUp.listen(onMouseUp)
+        ]);
         // wait a click for angular2 to set value
         Timer.run(() {
           updateClasses();

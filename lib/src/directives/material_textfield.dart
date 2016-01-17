@@ -2,6 +2,7 @@ library material_textfield;
 
 import 'dart:html';
 import 'dart:async';
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 const int NO_MAX_ROWS = -1;
 const String MAX_ROWS_ATTRIBUTE = 'maxrows';
@@ -14,13 +15,15 @@ const String IS_DISABLED = 'is-disabled';
 const String IS_INVALID = 'is-invalid';
 const String IS_UPGRADED = 'is-upgraded';
 
-class TextfieldBehavior {
+class TextfieldBehavior extends BaseBehavior {
   Element element;
   int maxRows = NO_MAX_ROWS;
   Element input;
 
   TextfieldBehavior(Element this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     //Element label = element.querySelector('.' + LABEL);
     input = element.querySelector('.' + TEXTFIELD_INPUT);
     if (input != null) {
@@ -31,13 +34,15 @@ class TextfieldBehavior {
           maxRows = NO_MAX_ROWS;
         }
       }
-      input.addEventListener('input', onInput);
-      input.addEventListener('focus', onFocus);
-      input.addEventListener('blur', onBlur);
-      input.addEventListener('reset', onReset);
+      subscriptions.addAll([
+        input.onInput.listen(onInput),
+        input.onFocus.listen(onFocus),
+        input.onBlur.listen(onBlur),
+        input.onReset.listen(onReset)
+      ]);
 
       if (maxRows != NO_MAX_ROWS) {
-        input.addEventListener('keydown', onKeyDown);
+        subscriptions.add(input.onKeyDown.listen(onKeyDown));
       }
 
       //wait a click for angular2 to init the value

@@ -1,6 +1,7 @@
 library material_spinner;
 
 import 'dart:html';
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 // constants
 const int SPINNER_LAYER_COUNT = 4;
@@ -15,10 +16,12 @@ const String SPINNER_RIGHT = 'mdl-spinner__right';
 const String IS_ACTIVE = 'is-active';
 const String IS_UPGRADED = 'is-upgraded';
 
-class SpinnerBehavior {
+class SpinnerBehavior extends BaseBehavior {
   Element element;
   SpinnerBehavior(this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     if (element != null) {
       for (int i = 1; i <= SPINNER_LAYER_COUNT; i++) {
         createLayer(i);

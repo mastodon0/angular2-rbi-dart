@@ -2,6 +2,7 @@ library material_tabs;
 
 import 'dart:html';
 import 'material_ripple.dart' show RippleBehavior;
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 const String TAB_CLASS = 'mdl-tabs__tab';
 const String PANEL_CLASS = 'mdl-tabs__panel';
@@ -13,11 +14,13 @@ const String TABS_RIPPLE_CONTAINER = 'mdl-tabs__ripple-container';
 const String RIPPLE = 'mdl-ripple';
 const String RIPPLE_IGNORE_EVENTS = 'mdl-js-ripple-effect--ignore-events';
 
-class TabsBehavior {
+class TabsBehavior extends BaseBehavior {
   Element element;
 
   TabsBehavior(this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     if (element.classes.contains(RIPPLE_EFFECT)) {
       element.classes.add(RIPPLE_IGNORE_EVENTS);
     }
@@ -28,9 +31,10 @@ class TabsBehavior {
           ..classes.addAll([TABS_RIPPLE_CONTAINER, RIPPLE_EFFECT])
           ..append(ripple);
         tab.append(rippleContainer);
-        tab.addEventListener('click', tabClickHandler);
+        subscriptions.add(tab.onClick.listen(tabClickHandler));
         RippleBehavior rb = new RippleBehavior(tab);
-        rb.init();
+        children.add(rb);
+        rb.ngOnInit();
       }
     }
     element.classes.add(IS_UPGRADED);

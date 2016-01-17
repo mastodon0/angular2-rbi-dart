@@ -1,15 +1,18 @@
 library material_tooltip;
 
 import 'dart:html';
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 const String IS_ACTIVE = 'is-active';
 
-class TooltipBehavior {
+class TooltipBehavior extends BaseBehavior {
   Element element;
+  Element forElement;
 
   TooltipBehavior(Element this.element);
-  init(){
-    Element forElement;
+
+  @override
+  ngOnInit() {
     String ForElId = element.getAttribute('for');
     if (ForElId == null) {
       ForElId = element.getAttribute('data-for');
@@ -20,11 +23,16 @@ class TooltipBehavior {
         if (!forElement.attributes.containsKey('tabindex')) {
           forElement.setAttribute('tabindex', '0');
         }
+
+        //removed manually
         forElement.addEventListener('mouseenter', handleMouseEnter, false);
         forElement.addEventListener('click', handleMouseEnter, false);
         forElement.addEventListener('touchstart', handleMouseEnter, false);
-        forElement.addEventListener('blur', handleMouseLeave);
-        forElement.addEventListener('mouseleave', handleMouseLeave);
+
+        subscriptions.addAll([
+          forElement.onBlur.listen(handleMouseLeave),
+          forElement.onMouseLeave.listen(handleMouseLeave)
+        ]);
       }
     }
   }
@@ -49,9 +57,19 @@ class TooltipBehavior {
   }
 
   handleMouseLeave(Event event) {
-    event.stopPropagation();
+    event?.stopPropagation();
     element.classes.remove(IS_ACTIVE);
     window.removeEventListener('scroll', handleMouseLeave);
     window.removeEventListener('touchmove', handleMouseLeave, false);
+  }
+
+  @override
+  ngOnDestroy() {
+    super.ngOnDestroy();
+    handleMouseLeave(null);
+
+    forElement.removeEventListener('mouseenter', handleMouseEnter, false);
+    forElement.removeEventListener('click', handleMouseEnter, false);
+    forElement.removeEventListener('touchstart', handleMouseEnter, false);
   }
 }

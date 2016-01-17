@@ -3,6 +3,7 @@ library material_icon_toggle;
 import 'material_ripple.dart' show RippleBehavior;
 import 'dart:html';
 import 'dart:async';
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 const String ICON_TOGGLE_INPUT = 'mdl-icon-toggle__input';
 const String RIPPLE_EFFECT = 'mdl-js-ripple-effect';
@@ -15,12 +16,14 @@ const String IS_DISABLED = 'is-disabled';
 const String IS_CHECKED = 'is-checked';
 const String IS_UPGRADED = 'is-upgraded';
 
-class IconToggleBehavior {
+class IconToggleBehavior extends BaseBehavior {
   Element element;
   InputElement inputElement;
 
   IconToggleBehavior(this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     inputElement = element.querySelector('.' + ICON_TOGGLE_INPUT);
 
     if (element.classes.contains(RIPPLE_EFFECT)) {
@@ -28,17 +31,20 @@ class IconToggleBehavior {
       Element rippleContainer = new SpanElement()
         ..classes.addAll(
             [ICON_TOGGLE_RIPPLE_CONTAINER, RIPPLE_EFFECT, RIPPLE_CENTER]);
-      rippleContainer.addEventListener('mouseup', onMouseUp);
+      subscriptions.add(rippleContainer.onMouseUp.listen(onMouseUp));
       Element ripple = new SpanElement()..classes.add(RIPPLE);
       rippleContainer.append(ripple);
       element.append(rippleContainer);
       RippleBehavior rb = new RippleBehavior(rippleContainer);
-      rb.init();
+      children.add(rb);
+      rb.ngOnInit();
     }
-    inputElement.addEventListener('change', onChange);
-    inputElement.addEventListener('focus', onFocus);
-    inputElement.addEventListener('blur', onBlur);
-    inputElement.addEventListener('mouseup', onMouseUp);
+    subscriptions.addAll([
+      inputElement.onChange.listen(onChange),
+      inputElement.onFocus.listen(onFocus),
+      inputElement.onBlur.listen(onBlur),
+      inputElement.onMouseUp.listen(onMouseUp)
+    ]);
     // wait a click for Angular to set values
     Timer.run(() {
       updateClasses();

@@ -21,130 +21,82 @@ import 'src/directives/material_tooltip.dart' show TooltipBehavior;
 import 'src/directives/material_snackbar.dart' show SnackbarBehavior;
 
 @Directive(selector: '.mdl-js-button')
-class MaterialButton extends ButtonBehavior implements OnInit{
+class MaterialButton extends ButtonBehavior implements OnInit, OnDestroy {
   MaterialButton(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-js-checkbox')
-class MaterialCheckbox extends CheckboxBehavior implements OnInit{
+class MaterialCheckbox extends CheckboxBehavior implements OnInit, OnDestroy {
   MaterialCheckbox(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-js-data-table')
-class MaterialDataTable extends DataTableBehavior implements OnInit{
+class MaterialDataTable extends DataTableBehavior implements OnInit, OnDestroy {
   MaterialDataTable(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-js-icon-toggle')
-class MaterialIconToggle extends IconToggleBehavior implements OnInit{
+class MaterialIconToggle extends IconToggleBehavior implements OnInit, OnDestroy {
   MaterialIconToggle(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-js-layout')
-class MaterialLayout extends LayoutBehavior implements OnInit {
+class MaterialLayout extends LayoutBehavior implements OnInit, OnDestroy {
   MaterialLayout(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-js-menu')
-class MaterialMenu extends MenuBehavior implements OnInit{
+class MaterialMenu extends MenuBehavior implements OnInit, OnDestroy {
   MaterialMenu(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-js-progress', inputs: const ['progress', 'buffer'])
-class MaterialProgress extends ProgressBehavior implements OnInit{
+class MaterialProgress extends ProgressBehavior implements OnInit, OnDestroy {
   MaterialProgress(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-js-radio')
-class MaterialRadio extends RadioBehavior implements OnInit{
+class MaterialRadio extends RadioBehavior implements OnInit, OnDestroy {
   MaterialRadio(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: 'mdl-js-ripple-effect')
-class MaterialRipple extends RippleBehavior implements OnInit{
+class MaterialRipple extends RippleBehavior implements OnInit, OnDestroy {
   MaterialRipple(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(
     selector: '.mdl-js-slider', inputs: const ['min', 'max', 'value', 'step'])
-class MaterialSlider extends SliderBehavior implements OnInit{
+class MaterialSlider extends SliderBehavior implements OnInit, OnDestroy {
   MaterialSlider(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-js-spinner')
-class MaterialSpinner extends SpinnerBehavior implements OnInit{
+class MaterialSpinner extends SpinnerBehavior implements OnInit, OnDestroy {
   MaterialSpinner(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-js-switch')
-class MaterialSwitch extends SwitchBehavior implements OnInit{
+class MaterialSwitch extends SwitchBehavior implements OnInit, OnDestroy {
   MaterialSwitch(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-js-tabs')
-class MaterialTabs extends TabsBehavior implements OnInit{
+class MaterialTabs extends TabsBehavior implements OnInit, OnDestroy {
   MaterialTabs(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-js-textfield')
-class MaterialTextfield extends TextfieldBehavior implements OnInit{
+class MaterialTextfield extends TextfieldBehavior implements OnInit, OnDestroy {
   MaterialTextfield(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-tooltip')
-class MaterialTooltip extends TooltipBehavior implements OnInit{
+class MaterialTooltip extends TooltipBehavior implements OnInit, OnDestroy {
   MaterialTooltip(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }
 
 @Directive(selector: '.mdl-js-snackbar')
-class MaterialSnackbar extends SnackbarBehavior implements OnInit{
+class MaterialSnackbar extends SnackbarBehavior implements OnInit, OnDestroy {
   MaterialSnackbar(ElementRef ref) : super(ref.nativeElement);
-  ngOnInit() {
-    init();
-  }
 }

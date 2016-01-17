@@ -3,6 +3,7 @@ library material_ripple;
 import 'dart:html';
 import 'dart:async' show Timer;
 import 'dart:math' show sqrt;
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 const String RIPPLE_EFFECT = 'mdl-js-ripple-effect';
 const String RIPPLE_CENTER = 'mdl-ripple--center';
@@ -16,7 +17,7 @@ const String INITIAL_SCALE = 'scale(0.0001, 0.0001)';
 const String INITIAL_SIZE = '1px';
 const String FINAL_SCALE = '';
 
-class RippleBehavior {
+class RippleBehavior extends BaseBehavior {
   Element element;
   Element rippleElement;
   int frameCount = 0;
@@ -26,17 +27,21 @@ class RippleBehavior {
   int boundHeight;
 
   RippleBehavior(this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     if (element != null) {
       if (!element.classes.contains(HAS_RIPPLE_EVENTS)) {
         if (!element.classes.contains(RIPPLE_IGNORE_EVENTS)) {
           rippleElement = element.querySelector('.' + RIPPLE);
-          element.addEventListener('mousedown', downHandler);
-          element.addEventListener('touchstart', downHandler);
-          element.addEventListener('mouseup', upHandler);
-          element.addEventListener('touchend', upHandler);
-          element.addEventListener('mouseleave', upHandler);
-          element.addEventListener('blur', upHandler);
+          subscriptions.addAll([
+            element.onMouseDown.listen(downHandler),
+            element.onTouchStart.listen(downHandler),
+            element.onMouseUp.listen(upHandler),
+            element.onTouchEnd.listen(upHandler),
+            element.onMouseLeave.listen(upHandler),
+            element.onBlur.listen(upHandler)
+          ]);
           element.classes.add(HAS_RIPPLE_EVENTS);
         }
       }

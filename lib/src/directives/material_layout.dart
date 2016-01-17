@@ -2,6 +2,7 @@ library material_layout;
 
 import 'dart:html';
 import 'material_ripple.dart' show RippleBehavior;
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 const String CONTAINER = 'mdl-layout__container';
 const String HEADER = 'mdl-layout__header';
@@ -56,7 +57,7 @@ const int SEAMED = 1;
 const int WATERFALL = 2;
 const int SCROLL = 3;
 
-class LayoutBehavior {
+class LayoutBehavior extends BaseBehavior {
   Element elem;
   Element header;
   Element drawer;
@@ -69,7 +70,8 @@ class LayoutBehavior {
 
   LayoutBehavior(this.elem);
 
-  init() {
+  @override
+  ngOnInit() {
     DivElement container = new DivElement()..classes.add(CONTAINER);
     elem.parent.insertBefore(container, elem);
     elem.parent.children.remove(elem);
@@ -98,8 +100,10 @@ class LayoutBehavior {
         mode = SEAMED;
       } else if (header.classes.contains(HEADER_WATERFALL)) {
         mode = WATERFALL;
-        header.addEventListener('transitionend', headerTransitionEndHandler);
-        header.addEventListener('click', headerClickHandler);
+        subscriptions.addAll([
+          header.onTransitionEnd.listen(headerTransitionEndHandler),
+          header.onClick.listen(headerClickHandler)
+        ]);
       } else if (header.classes.contains(HEADER_SCROLL)) {
         mode = SCROLL;
         container.classes.add(HAS_SCROLLING_HEADER);
@@ -116,7 +120,7 @@ class LayoutBehavior {
           tabBar.classes.remove(CASTING_SHADOW);
         }
       } else if (mode == WATERFALL) {
-        content.addEventListener('scroll', contentScrollHandler);
+        subscriptions.add(content.onScroll.listen(contentScrollHandler));
         contentScrollHandler(null);
       }
     }
@@ -137,7 +141,7 @@ class LayoutBehavior {
       } else if (drawer.classes.contains(ON_SMALL_SCREEN)) {
         drawerButton.classes.add(ON_SMALL_SCREEN);
       }
-      drawerButton.addEventListener('click', drawerToggleHandler);
+      subscriptions.add(drawerButton.onClick.listen(drawerToggleHandler));
 
       elem.classes.add(HAS_DRAWER);
       if (elem.classes.contains(FIXED_HEADER)) {
@@ -146,8 +150,8 @@ class LayoutBehavior {
         elem.insertBefore(drawerButton, content);
       }
       obfuscator = new DivElement()
-        ..classes.add(OBFUSCATOR)
-        ..addEventListener('click', drawerToggleHandler);
+        ..classes.add(OBFUSCATOR);
+      subscriptions.add(obfuscator.onClick.listen(drawerToggleHandler));
       elem.append(obfuscator);
     }
 
@@ -169,8 +173,8 @@ class LayoutBehavior {
       leftButton = new DivElement()
         ..classes.add(TAB_BAR_BUTTON)
         ..classes.add(TAB_BAR_LEFT_BUTTON)
-        ..addEventListener('click', leftButtonClickHandler)
         ..append(leftButtonIcon);
+      subscriptions.add(leftButton.onClick.listen(leftButtonClickHandler));
 
       Element rightButtonIcon = new Element.tag('i')
         ..classes.add(ICON)
@@ -179,14 +183,14 @@ class LayoutBehavior {
       rightButton = new DivElement()
         ..classes.add(TAB_BAR_BUTTON)
         ..classes.add(TAB_BAR_RIGHT_BUTTON)
-        ..addEventListener('click', rightButtonClickHandler)
         ..append(rightButtonIcon);
+      subscriptions.add(rightButton.onClick.listen(rightButtonClickHandler));
 
       tabContainer.append(leftButton);
       tabContainer.append(tabBar);
       tabContainer.append(rightButton);
 
-      tabBar.addEventListener('scroll', tabScrollHandler);
+      subscriptions.add(tabBar.onScroll.listen(tabScrollHandler));
       tabScrollHandler(null);
 
       if (tabBar.classes.contains(RIPPLE_EFFECT)) {
@@ -204,9 +208,10 @@ class LayoutBehavior {
           rippleContainer.append(ripple);
           tab.append(rippleContainer);
           RippleBehavior rb = new RippleBehavior(tab);
-          rb.init();
+          children.add(rb);
+          rb.ngOnInit();
         }
-        tab.addEventListener('click', tabClickHandler);
+        subscriptions.add(tab.onClick.listen(tabClickHandler));
       }
     }
     elem.classes.add(IS_UPGRADED);

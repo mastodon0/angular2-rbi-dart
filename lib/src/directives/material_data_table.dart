@@ -2,6 +2,7 @@ library material_data_table;
 
 import 'dart:html';
 import 'material_checkbox.dart' show CheckboxBehavior;
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 const String DATA_TABLE = 'mdl-data-table';
 const String SELECTABLE = 'mdl-data-table--selectable';
@@ -14,11 +15,13 @@ const String RIPPLE_EFFECT = 'mdl-js-ripple-effect';
 const String DATA_TABLE_SELECT = 'mdl-data-table__select';
 const String CHECKBOX_INPUT = 'mdl-checkbox__input';
 
-class DataTableBehavior {
+class DataTableBehavior extends BaseBehavior {
   Element element;
 
   DataTableBehavior(this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     Element firstHeader = element.querySelector('th');
     List<Element> rows = element.querySelectorAll('tbody tr');
     List<Element> footRows = element.querySelectorAll('tfoot tr');
@@ -86,7 +89,7 @@ class DataTableBehavior {
       ..classes.add(CHECKBOX_INPUT);
     if (row != null) {
       checkbox.checked = row.classes.contains(IS_SELECTED);
-      checkbox.addEventListener('change', selectRow(checkbox, row, null));
+      subscriptions.add(checkbox.onChange.listen((_) => selectRow(checkbox, row, null)));
 
       if (row.dataset.containsKey('mdlDataTableSelectableName')) {
         checkbox.name = row.dataset['mdlDataTableSelectableName'];
@@ -95,11 +98,12 @@ class DataTableBehavior {
         checkbox.value = row.dataset['mdlDataTableSelectableValue'];
       }
     } else if (opt_rows != null) {
-      checkbox.addEventListener('change', selectRow(checkbox, null, opt_rows));
+      subscriptions.add(checkbox.onChange.listen((_) => selectRow(checkbox, null, opt_rows)));
     }
     label.append(checkbox);
     CheckboxBehavior cb = new CheckboxBehavior(label);
-    cb.init();
+    children.add(cb);
+    cb.ngOnInit();
     return label;
   }
 }

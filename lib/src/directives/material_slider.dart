@@ -2,6 +2,7 @@ library material_slider;
 
 import 'dart:html';
 import 'dart:math';
+import 'package:angular2_rbi/src/directives/base_behavior.dart';
 
 //css constants
 const String IE_CONTAINER = 'mdl-slider__ie-container';
@@ -12,7 +13,7 @@ const String BACKGROUND_UPPER = 'mdl-slider__background-upper';
 const String IS_LOWEST_VALUE = 'is-lowest-value';
 const String IS_UPGRADED = 'is-upgraded';
 
-class SliderBehavior {
+class SliderBehavior extends BaseBehavior {
   InputElement element;
 //  bool isIE;
   String _value;
@@ -24,7 +25,9 @@ class SliderBehavior {
   Element backgroundUpper;
 
   SliderBehavior(this.element);
-  init(){
+
+  @override
+  ngOnInit() {
     Element container = new DivElement()..classes.add(SLIDER_CONTAINER);
     element.parent.insertBefore(container, element);
     element.parent.children.remove(element);
@@ -36,9 +39,11 @@ class SliderBehavior {
     backgroundUpper = new DivElement()..classes.add(BACKGROUND_UPPER);
     backgroundFlex.append(backgroundUpper);
 
-    element.addEventListener('input', onChange);
-    element.addEventListener('change', onChange);
-    element.addEventListener('mouseup', onMouseUp);
+    subscriptions.addAll([
+      element.onInput.listen(onChange),
+      element.onChange.listen(onChange),
+      element.onMouseUp.listen(onMouseUp)
+    ]);
 
     if (element.getAttribute('value') == element.getAttribute('min')) {
       element.classes.add(IS_LOWEST_VALUE);
